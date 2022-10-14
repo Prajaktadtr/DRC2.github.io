@@ -1,0 +1,197 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <script>
+        //var name,date1,date2,date_difference,rent,cal;
+        function calc()
+        {
+            var name,date1,date2,date_difference,rent,cal,rentm;
+            date1 = document.getElementById("d1").value;
+            date2 = document.getElementById("d2").value;
+
+            //define two date object variables to store the date values
+            var datel1 = new  Date(date1);
+            var datel2 = new  Date(date2);
+
+            //calculate time difference
+            date_difference=datel2.getTime()-datel1.getTime();
+
+           //calculate days difference by dividing total milliseconds
+
+           var result= date_difference/(1000*60*60*24);
+
+           name=document.getElementById("name").value;
+           rent=parseInt(document.getElementById("rm").value);
+           //rent=rentm/30;
+           cal=rent*result+rent;
+           //document.getElementById("re").value=cal;
+           //document.write(cal);
+
+           console.log(cal);
+           if (localStorage.getItem('itemsJson')== null){
+            itemJsonArray = [];
+            itemJsonArray.push([name, rent, date1, date2, result, cal]);
+            localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray))
+            }
+           else{
+            itemJsonArrayStr = localStorage.getItem('itemsJson')
+            itemJsonArray = JSON.parse(itemJsonArrayStr);
+            itemJsonArray.push([name, rent, date1, date2, result, cal]);
+            localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray))
+            }
+          update();
+           
+           
+        }
+
+        
+
+
+        function update(){
+            
+            if (localStorage.getItem('itemsJson')== null){
+                itemJsonArray = []; 
+                localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray))
+            } 
+            else{
+                itemJsonArrayStr = localStorage.getItem('itemsJson')
+                itemJsonArray = JSON.parse(itemJsonArrayStr); 
+            }
+            // Populate the table
+            let tableBody = document.getElementById("tableBody");
+            let str = "";
+            itemJsonArray.forEach((element, index) => {
+                str += `
+                <tr>
+                <th scope="row">${index + 1}</th>
+                <td>${element[0]}</td>
+                <td>${element[1]}</td> 
+                <td>${element[2]}</td>
+                <td>${element[3]}</td>
+                <td>${element[4] + 1 }</td>
+                <td>${element[5]}</td>
+                <td><button class="btn btn-sm btn-danger" onclick="deleted(${index})">Delete</button></td> 
+                </tr>`; 
+            });
+            tableBody.innerHTML = str;
+        }
+        add = document.getElementById("add");
+        add.addEventListener("click", calc);
+        update();
+
+
+        function deleted(itemIndex){
+            console.log("Delete", itemIndex);
+            itemJsonArrayStr = localStorage.getItem('itemsJson')
+            itemJsonArray = JSON.parse(itemJsonArrayStr);
+            // Delete itemIndex element from the array
+            itemJsonArray.splice(itemIndex, 1);
+            localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray));
+            update();
+
+        }
+        function clearStorage(){
+            if (confirm("Do you areally want to clear?")){
+            console.log('Clearing the storage')
+            localStorage.clear();
+            update()
+            }
+        }
+
+    </script>
+
+    <style>
+      .b
+      {
+        background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
+      }
+
+    </style>
+</head>
+<body>
+    
+
+
+        
+        
+                  <center>
+             
+            <div class="rounded-4 w-25 m-5 p-5 b text-dark">
+                <h2 class="text-center">DAYWISE RENT CALCULATOR</h2>
+                  <div class="mb-3">
+                    <label for="formGroupExampleInput" class="form-label float-start">Enter Tedent Name</label>
+                    <input type="text" class="form-control" id="name" placeholder="">
+                  </div>
+                  <div class="mb-3">
+                    <label for="formGroupExampleInput2" class="form-label float-start">Enter Rent Per Day</label>
+                    <input type="text" class="form-control" id="rm" placeholder="">
+                  </div>
+                  <div class="mb-3">
+                    <label for="formGroupExampleInput" class="form-label float-start">Enter Joinning date</label>
+                    <input type="date" class="form-control" id="d1" placeholder="">
+                  </div>
+                  <div class="mb-3">
+                    <label for="formGroupExampleInput2" class="form-label float-start">Enter Date upto which rent calculate</label>
+                    <input type="date" class="form-control" id="d2" placeholder="">
+                  </div>
+
+                  <button  class="btn btn-outline-dark" id="add" onclick="calc()" >Calculate</button>
+                  <button id="clear" class="btn btn-secondary" onclick="clearStorage()">Clear reciepts</button>
+            </div>
+
+
+              </center>
+            <!-- <input type="text" id="re"> -->
+
+
+        
+            
+    
+ 
+            <center>
+        <div id="items" class="my-4">
+            <h2>Reciept</h2>
+            <table class="table text-dark b m-5 p-5 w-75">
+                <thead>
+                  <tr>
+                    <th scope="col">SNo</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Per day charges</th> 
+                    <th scope="col">Start date</th> 
+                    <th scope="col">End date</th>
+                    <th scope="col">Total days</th>
+                    <th scope="col">Amount rent</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+                  <tr>
+                    <th scope="row">1</th>
+                    <td></td>
+                    <td></td> 
+                    <td></td> 
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><button class="btn btn-sm btn-secondary">Delete</button></td> 
+                  </tr>
+                  
+                </tbody>
+              </table>
+        </div>
+      </center>
+    </div>
+</body>
+</html>
